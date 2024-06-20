@@ -1,6 +1,16 @@
 import pygame
 import math
 
+# notes
+
+# level editor toggle button
+# level editor
+# upward collisions next
+
+# annoying that probie cannot be on the very edge of some blocks without falling off.
+# dont fully understand the horizontal collision
+# downward collision can probably glitch through blocks at high speed.
+
 # pygame setup
 pygame.init()
 
@@ -11,12 +21,15 @@ running = True
 
 size = 32
 
-ground_arr = [(0, 9), (1,10), (2,10), (6,10)]
+ground_arr = [(0, 9), (1,10), (2,9), (2,10), (3,9), (5,11), (6,9), (6,10)]
 
 def check_grounded(user):
   return ( ( math.floor(user.get_x() / size), math.floor( (user.get_y() + size) / size ) ) in ground_arr or
            ( math.floor( (user.get_x() + size ) / size), math.floor( (user.get_y() + size) / size ) ) in ground_arr
          )
+
+def hor_collision(user, new_dest_x):
+  return ( math.floor(new_dest_x / size), math.floor( user.get_y() / size ) ) in ground_arr
 
 class Probie():
   def __init__(self, x, y, vel_x, vel_y, grounded, jumping):
@@ -83,9 +96,11 @@ while running:
         p = initialize_probie()
   keys = pygame.key.get_pressed()
   if keys[pygame.K_LEFT]:
-    p.set_x(p.get_x() - size/4)
+    if not hor_collision(p, p.get_x() - size/4):
+      p.set_x(p.get_x() - size/4)
   if keys[pygame.K_RIGHT]:
-    p.set_x(p.get_x() + size/4)
+    if not hor_collision(p, p.get_x() + size):
+      p.set_x(p.get_x() + size/4)
   if keys[pygame.K_UP]:
     if p.is_grounded():
       p.set_vel_y(-4 * size/4)
